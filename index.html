@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Website Cek Khodam</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('./bghome.webp');
+            background-size: cover;
+            background-repeat: no-repeat;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 0;
+        }
+        h1 {
+            margin-top: 20px;
+            color: white;
+        }
+        #input-container {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        #input-container input {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+        #input-container button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+        }
+        #input-container button:hover {
+            background-color: #0056b3;
+        }
+        #loading-spinner {
+            display: none;
+            margin-top: 20px;
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-radius: 50%;
+            border-top: 5px solid #007bff;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        #khodam-name {
+            margin-top: 20px;
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+
+        footer {
+            padding: 10px;
+            background-color: red;
+            color: white;
+            margin-top: 5%;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Cek Nama Khodam</h1>
+    <div id="input-container">
+        <input type="text" id="name-input" placeholder="Masukkan Nama Anda">
+        <button onclick="generateKhodam()">Cek Khodam</button>
+    </div>
+    <div id="loading-spinner"></div>
+    <div id="khodam-name"></div>
+
+    <script>
+        const khodamNames = [
+            "Khodam Naga", "Naga Sembara", "Naga Langit", "Naga Kencana", "Naga Sutra", "Naga Serpentina", "Naga Siluman",
+            "Naga Raja", "Naga Merah", "Naga Hijau", "Naga Biru", "Naga Putih", "Naga Emas", "Naga Perak", "Naga Baja",
+            "Naga Karang", "Naga Laut", "Naga Gunung", "Naga Hutan", "Naga Pesisir", "Naga Senja", "Naga Fajar", "Naga Awan",
+            "Naga Hujan", "Naga Petir", "Naga Angin", "Naga Bumi", "Naga Cahaya", "Naga Bayu", "Naga Surya", "Naga Candra",
+            "Khodam Barong", "Singo Barong", "Kebo Barong", "Lembu Barong", "Kijang Barong", "Harimau Barong", "Macan Barong",
+            "Gajah Barong", "Sapi Barong", "Kuda Barong", "Babi Barong", "Ayam Barong", "Bebek Barong", "Kerbau Barong",
+            "Kambing Barong", "Domba Barong", "Ular Barong", "Burung Barong", "Anjing Barong", "Kucing Barong", "Musang Barong",
+            "Tikus Barong", "Kelinci Barong", "Monyet Barong", "Serigala Barong", "Banteng Barong", "Jaran Barong", "Trenggiling Barong",
+            "Landak Barong", "Singa Barong", "Hiu Barong", "Khodam Nyi Roro Kidul", "Ratu Laut Selatan", "Putri Samudra", "Dewi Samudra",
+            "Ratu Kidul", "Nyi Blorong", "Nyi Lara Kidul", "Nyi Dewi Kidul", "Ratu Pelangi", "Ratu Dewi Lanjar", "Nyi Ratu Kidul",
+            "Putri Kidul", "Dewi Sri Kidul", "Putri Selatan", "Dewi Samudra Selatan", "Nyi Blitar", "Nyi Pantai Selatan",
+            "Ratu Pantai Selatan", "Putri Angin Selatan", "Dewi Gelombang", "Putri Ombak Selatan", "Nyi Loro Kidul", "Nyi Laut Kidul",
+            "Putri Pantai Selatan", "Dewi Pasir Selatan", "Nyi Sembara Kidul", "Putri Gelombang", "Nyi Samudra Kidul", "Ratu Ombak",
+            "Dewi Roro Kidul", "Putri Biru Selatan", "Dewi Pantai Selatan", "Putri Lumbung Kidul", "Ratu Angin Selatan", "Putri Samudra Selatan",
+            "Nyi Dewi Samudra", "Putri Laut Selatan", "Dewi Ombak Selatan", "Putri Karang Selatan", "Nyi Sembara Laut Selatan", "Ratu Samudra Selatan",
+            "Khodam Wijaya Kusuma", "Khodam Pandawa Lima", "Khodam Sabdo Palon", "Khodam Nyi Ratu Nawangwulan", "Khodam Ratu Pantai Utara",
+            "Khodam Eyang Semar", "Khodam Sunan Kalijaga", "Khodam Prabu Siliwangi", "Khodam Kanjeng Ratu Kidul", "Khodam Dewi Anjani",
+            "Khodam Arya Penangsang", "Khodam Ratu Laut Utara", "Khodam Dewi Sekar Kedaton", "Khodam Putri Samudra Timur", "Khodam Putri Serang",
+            "Khodam Kuda Lumping", "Khodam Reog Ponorogo", "Khodam Jaran Kepang", "Khodam Dewi Kunti", "Khodam Dewi Loro Jonggrang",
+            "Khodam Dewi Nawang Wulan", "Khodam Prabu Angling Dharma", "Khodam Sunan Gunung Jati", "Khodam Syaikh Siti Jenar",
+            "Khodam Prabu Jayabaya", "Khodam Raden Mas Said", "Khodam Arya Salaka", "Khodam Pangeran Diponegoro", "Khodam Pangeran Samber Nyawa",
+            "Khodam Nyai Roro Kidul"
+        ];
+
+        function getRandomElement(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        function generateKhodam() {
+            const nameInput = document.getElementById('name-input').value;
+            if (nameInput.trim() === '') {
+                alert('Mohon masukkan nama Anda');
+                return;
+            }
+
+            const spinner = document.getElementById('loading-spinner');
+            const khodamNameDiv = document.getElementById('khodam-name');
+
+            spinner.style.display = 'block';
+            khodamNameDiv.textContent = '';
+
+            setTimeout(() => {
+                const khodamName = getRandomElement(khodamNames);
+                khodamNameDiv.textContent = `Nama Khodam Anda: ${khodamName}`;
+                spinner.style.display = 'none';
+            }, 2000);
+        }
+    </script>
+
+    <footer>@fdhlan.21</footer>
+</body>
+</html>
